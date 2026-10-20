@@ -26,6 +26,6 @@ fun InicioScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(12.dp))
         Text("Inclusion social y laboral")
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Conoce nuestro trabajo y formas de colaborar.")
+        Text("Conoce nuestro trabajo y cómo donar.")
     }
 }
