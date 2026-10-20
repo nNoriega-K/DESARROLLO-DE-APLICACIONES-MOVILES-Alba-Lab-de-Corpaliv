@@ -11,11 +11,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.miapp.ui.components.AppDrawer
 import com.example.miapp.ui.components.AppTopBar
-import com.example.miapp.ui.screens.ColaborarScreen
+import com.example.miapp.ui.screens.DonacionesScreen
+import com.example.miapp.ui.screens.HistorialScreen
 import com.example.miapp.ui.screens.InicioScreen
 import com.example.miapp.ui.screens.NosotrosScreen
 import com.example.miapp.ui.screens.ProductosScreen
-import com.example.miapp.ui.screens.UbicacionScreen
 
 @Composable
 fun App() {
@@ -40,8 +40,8 @@ fun App() {
                 Pantalla.Inicio -> InicioScreen(modifier)
                 Pantalla.Nosotros -> NosotrosScreen(modifier)
                 Pantalla.Productos -> ProductosScreen(modifier)
-                Pantalla.Colaborar -> ColaborarScreen(modifier)
-                Pantalla.Ubicacion -> UbicacionScreen(modifier)
+                Pantalla.Donaciones -> DonacionesScreen(modifier)
+                Pantalla.Historial -> HistorialScreen(modifier)
             }
         }
     }

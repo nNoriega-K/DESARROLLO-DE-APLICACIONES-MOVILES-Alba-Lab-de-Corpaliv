@@ -4,6 +4,6 @@ enum class Pantalla(val titulo: String) {
     Inicio("Inicio"),
     Nosotros("Nosotros"),
     Productos("Productos"),
-    Colaborar("Colaborar"),
-    Ubicacion("Ubicación")
+    Donaciones("Donaciones"),
+    Historial("Historial")
 }
