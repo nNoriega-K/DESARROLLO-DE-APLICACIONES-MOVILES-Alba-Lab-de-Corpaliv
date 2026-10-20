@@ -1,12 +1,14 @@
 package com.example.miapp.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.miapp.data.local.AppDatabase
 import com.example.miapp.data.model.Campo
 import com.example.miapp.data.model.DonacionConfirmada
 import com.example.miapp.data.model.DonacionErrores
 import com.example.miapp.data.model.DonacionForm
-import com.example.miapp.util.DonacionValidator
+import com.example.miapp.data.repository.DonacionRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,8 +18,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
-class DonacionViewModel : ViewModel() {
+class DonacionViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val repositorio =
+        DonacionRepository(AppDatabase.getInstance(application).donacionDao())
 
     private val _form = MutableStateFlow(DonacionForm())
     val form: StateFlow<DonacionForm> = _form.asStateFlow()
@@ -30,6 +36,9 @@ class DonacionViewModel : ViewModel() {
 
     private val _procesando = MutableStateFlow(false)
     val procesando: StateFlow<Boolean> = _procesando.asStateFlow()
+
+    private val _errorGuardado = MutableStateFlow<String?>(null)
+    val errorGuardado: StateFlow<String?> = _errorGuardado.asStateFlow()
 
     private val _confirmacion = MutableStateFlow<DonacionConfirmada?>(null)
     val confirmacion: StateFlow<DonacionConfirmada?> = _confirmacion.asStateFlow()
@@ -79,17 +88,26 @@ class DonacionViewModel : ViewModel() {
 
         viewModelScope.launch {
             _procesando.value = true
-            delay(1_500)                                                              
-            _confirmacion.value = DonacionConfirmada(
-                nombre = datos.nombre.trim(),
-                monto = datos.monto.toInt(),
-                destino = datos.destino,
-                mensual = datos.mensual
-            )
+            _errorGuardado.value = null
+            try {
+                delay(1_500)                                                              
 
-            _form.value = DonacionForm()
-            _tocados.value = emptySet()
-            _procesando.value = false
+                repositorio.guardar(datos)
+                _confirmacion.value = DonacionConfirmada(
+                    nombre = datos.nombre.trim(),
+                    monto = datos.monto.toInt(),
+                    destino = datos.destino,
+                    mensual = datos.mensual
+                )
+
+                _form.value = DonacionForm()
+                _tocados.value = emptySet()
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                _errorGuardado.value = "No se pudo guardar la donación. Inténtalo de nuevo."
+            } finally {
+                _procesando.value = false
+            }
         }
     }
 

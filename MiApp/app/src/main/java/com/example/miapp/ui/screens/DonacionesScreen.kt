@@ -52,7 +52,7 @@ import com.example.miapp.ui.components.CampoFormulario
 import com.example.miapp.ui.components.ErrorAnimado
 import com.example.miapp.ui.components.TarjetaVisualTransformation
 import com.example.miapp.ui.components.VencimientoVisualTransformation
-import com.example.miapp.util.DonacionValidator
+import com.example.miapp.viewmodel.DonacionValidator
 import com.example.miapp.util.formatoPesos
 import com.example.miapp.viewmodel.DonacionViewModel
 
@@ -76,6 +76,7 @@ fun DonacionesScreen(
     val errores by viewModel.errores.collectAsState()
     val procesando by viewModel.procesando.collectAsState()
     val confirmacion by viewModel.confirmacion.collectAsState()
+    val errorGuardado by viewModel.errorGuardado.collectAsState()
 
     Column(
         modifier = modifier
@@ -252,6 +253,7 @@ fun DonacionesScreen(
         ErrorAnimado(error = errores.terminos, modifier = Modifier.padding(start = 4.dp))
 
         Spacer(Modifier.height(8.dp))
+        ErrorAnimado(error = errorGuardado)
         Button(
             onClick = viewModel::donar,
             enabled = !procesando,

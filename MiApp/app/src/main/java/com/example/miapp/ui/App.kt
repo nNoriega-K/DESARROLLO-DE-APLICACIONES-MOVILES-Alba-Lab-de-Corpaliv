@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import com.example.miapp.ui.components.AppDrawer
 import com.example.miapp.ui.components.AppTopBar
 import com.example.miapp.ui.screens.DonacionesScreen
+import com.example.miapp.ui.screens.HistorialScreen
 import com.example.miapp.ui.screens.InicioScreen
 import com.example.miapp.ui.screens.NosotrosScreen
 import com.example.miapp.ui.screens.ProductosScreen
@@ -40,6 +41,7 @@ fun App() {
                 Pantalla.Nosotros -> NosotrosScreen(modifier)
                 Pantalla.Productos -> ProductosScreen(modifier)
                 Pantalla.Donaciones -> DonacionesScreen(modifier)
+                Pantalla.Historial -> HistorialScreen(modifier)
             }
         }
     }
