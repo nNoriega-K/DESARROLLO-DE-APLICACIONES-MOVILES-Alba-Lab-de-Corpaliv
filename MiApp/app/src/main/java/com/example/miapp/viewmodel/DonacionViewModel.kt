@@ -8,13 +8,17 @@ import com.example.miapp.data.model.Campo
 import com.example.miapp.data.model.DonacionConfirmada
 import com.example.miapp.data.model.DonacionErrores
 import com.example.miapp.data.model.DonacionForm
+import com.example.miapp.data.model.Ubicacion
 import com.example.miapp.data.repository.DonacionRepository
+import com.example.miapp.data.repository.UbicacionRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,6 +38,15 @@ class DonacionViewModel(application: Application) : AndroidViewModel(application
         DonacionValidator.validar(datos).soloDe(tocados)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DonacionErrores())
 
+    private val _mostrarSugerencias = MutableStateFlow(false)
+
+    val sugerencias: StateFlow<List<Ubicacion>> = combine(
+        _form.map { it.ubicacion }.distinctUntilChanged(),
+        _mostrarSugerencias
+    ) { texto, mostrar ->
+        if (mostrar) UbicacionRepository.buscar(texto) else emptyList()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
     private val _procesando = MutableStateFlow(false)
     val procesando: StateFlow<Boolean> = _procesando.asStateFlow()
 
@@ -50,12 +63,20 @@ class DonacionViewModel(application: Application) : AndroidViewModel(application
     fun actualizarMonto(valor: String) =
         _form.update { it.copy(monto = valor.filter(Char::isDigit).take(7)) }
 
-    fun actualizarDestino(valor: String) {
-        _form.update { it.copy(destino = valor) }
-        tocar(Campo.Destino)
+    fun actualizarUbicacion(valor: String) {
+        _form.update { it.copy(ubicacion = valor.take(40)) }
+        _mostrarSugerencias.value = true
     }
 
-    fun actualizarMensual(valor: Boolean) = _form.update { it.copy(mensual = valor) }
+    fun elegirUbicacion(ubicacion: Ubicacion) {
+        _form.update { it.copy(ubicacion = ubicacion.comuna) }
+        _mostrarSugerencias.value = false
+        tocar(Campo.Ubicacion)
+    }
+
+    fun ocultarSugerencias() {
+        _mostrarSugerencias.value = false
+    }
 
     fun actualizarFecha(valor: Long?) {
         _form.update { it.copy(fechaCargo = valor) }
@@ -83,8 +104,11 @@ class DonacionViewModel(application: Application) : AndroidViewModel(application
 
         _tocados.value = Campo.entries.toSet()
 
-        val datos = _form.value
-        if (DonacionValidator.validar(datos).hayErrores) return
+        val formulario = _form.value
+        if (DonacionValidator.validar(formulario).hayErrores) return
+
+        val ubicacion = UbicacionRepository.encontrarExacta(formulario.ubicacion) ?: return
+        val datos = formulario.copy(ubicacion = ubicacion.comuna)
 
         viewModelScope.launch {
             _procesando.value = true
@@ -96,12 +120,12 @@ class DonacionViewModel(application: Application) : AndroidViewModel(application
                 _confirmacion.value = DonacionConfirmada(
                     nombre = datos.nombre.trim(),
                     monto = datos.monto.toInt(),
-                    destino = datos.destino,
-                    mensual = datos.mensual
+                    ubicacion = datos.ubicacion
                 )
 
                 _form.value = DonacionForm()
                 _tocados.value = emptySet()
+                _mostrarSugerencias.value = false
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 _errorGuardado.value = "No se pudo guardar la donación. Inténtalo de nuevo."

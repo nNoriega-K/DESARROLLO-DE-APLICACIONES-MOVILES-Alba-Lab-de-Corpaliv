@@ -30,7 +30,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -46,23 +45,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.miapp.data.model.Campo
-import com.example.miapp.ui.components.CampoDesplegable
 import com.example.miapp.ui.components.CampoFecha
 import com.example.miapp.ui.components.CampoFormulario
+import com.example.miapp.ui.components.CampoUbicacion
 import com.example.miapp.ui.components.ErrorAnimado
 import com.example.miapp.ui.components.TarjetaVisualTransformation
 import com.example.miapp.ui.components.VencimientoVisualTransformation
 import com.example.miapp.viewmodel.DonacionValidator
 import com.example.miapp.util.formatoPesos
 import com.example.miapp.viewmodel.DonacionViewModel
-
-private val DESTINOS = listOf(
-    "Inclusión laboral",
-    "Formación",
-    "Apoyo a personas y familias",
-    "Vinculación con empresas",
-    "Donde más se necesite"
-)
 
 private val MONTOS_RAPIDOS = listOf(5_000, 10_000, 20_000)
 
@@ -76,6 +67,7 @@ fun DonacionesScreen(
     val errores by viewModel.errores.collectAsState()
     val procesando by viewModel.procesando.collectAsState()
     val confirmacion by viewModel.confirmacion.collectAsState()
+    val sugerencias by viewModel.sugerencias.collectAsState()
     val errorGuardado by viewModel.errorGuardado.collectAsState()
 
     Column(
@@ -119,6 +111,18 @@ fun DonacionesScreen(
             onPerdioFoco = { viewModel.tocar(Campo.Correo) }
         )
 
+        CampoUbicacion(
+            value = form.ubicacion,
+            onValueChange = viewModel::actualizarUbicacion,
+            sugerencias = sugerencias,
+            onSugerenciaElegida = viewModel::elegirUbicacion,
+            error = errores.ubicacion,
+            onPerdioFoco = {
+                viewModel.tocar(Campo.Ubicacion)
+                viewModel.ocultarSugerencias()
+            }
+        )
+
         Spacer(Modifier.height(8.dp))
         Text("Tu donación", style = MaterialTheme.typography.titleMedium)
 
@@ -152,14 +156,6 @@ fun DonacionesScreen(
             onPerdioFoco = { viewModel.tocar(Campo.Monto) }
         )
 
-        CampoDesplegable(
-            valor = form.destino,
-            opciones = DESTINOS,
-            label = "Destino de la donación",
-            error = errores.destino,
-            onSeleccion = viewModel::actualizarDestino
-        )
-
         CampoFecha(
             fechaMillis = form.fechaCargo,
             label = "Fecha del cargo",
@@ -167,24 +163,6 @@ fun DonacionesScreen(
             onFechaSeleccionada = viewModel::actualizarFecha,
             ayuda = "Día en que se realiza el cargo"
         )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text("Donación mensual")
-                Text(
-                    "Se repite todos los meses",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-            Switch(
-                checked = form.mensual,
-                onCheckedChange = viewModel::actualizarMensual
-            )
-        }
 
         Spacer(Modifier.height(8.dp))
         Text("Datos de la tarjeta", style = MaterialTheme.typography.titleMedium)
@@ -291,8 +269,7 @@ fun DonacionesScreen(
             text = {
                 Text(
                     "${c.nombre}, registramos tu donación de ${formatoPesos(c.monto)} " +
-                            "para «${c.destino}»." +
-                            (if (c.mensual) " Se repetirá todos los meses." else "") +
+                            "desde ${c.ubicacion}." +
                             "\n\nEsto es una simulación: no se realizó ningún cobro."
                 )
             },

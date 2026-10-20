@@ -15,6 +15,7 @@ import com.example.miapp.ui.screens.DonacionesScreen
 import com.example.miapp.ui.screens.HistorialScreen
 import com.example.miapp.ui.screens.InicioScreen
 import com.example.miapp.ui.screens.NosotrosScreen
+import com.example.miapp.ui.screens.NotasScreen
 import com.example.miapp.ui.screens.ProductosScreen
 
 @Composable
@@ -42,6 +43,7 @@ fun App() {
                 Pantalla.Productos -> ProductosScreen(modifier)
                 Pantalla.Donaciones -> DonacionesScreen(modifier)
                 Pantalla.Historial -> HistorialScreen(modifier)
+                Pantalla.Notas -> NotasScreen(modifier)
             }
         }
     }

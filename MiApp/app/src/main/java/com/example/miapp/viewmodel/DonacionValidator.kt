@@ -2,6 +2,7 @@ package com.example.miapp.viewmodel
 
 import com.example.miapp.data.model.DonacionErrores
 import com.example.miapp.data.model.DonacionForm
+import com.example.miapp.data.repository.UbicacionRepository
 import com.example.miapp.util.formatoPesos
 import com.example.miapp.util.hoyUtcMillis
 import java.util.Calendar
@@ -22,13 +23,19 @@ object DonacionValidator {
         nombre = validarNombre(f.nombre),
         correo = validarCorreo(f.correo),
         monto = validarMonto(f.monto),
-        destino = if (f.destino.isBlank()) "Selecciona a qué quieres destinar tu donación" else null,
+        ubicacion = validarUbicacion(f.ubicacion),
         fecha = validarFecha(f.fechaCargo, hoyUtc),
         tarjeta = validarTarjeta(f.numeroTarjeta),
         vencimiento = validarVencimiento(f.vencimiento, ahora),
         cvv = validarCvv(f.cvv, f.numeroTarjeta),
         terminos = if (!f.aceptaTerminos) "Debes aceptar los términos y condiciones" else null
     )
+
+    private fun validarUbicacion(texto: String): String? = when {
+        texto.isBlank() -> "Indica desde qué parte de Chile donas"
+        UbicacionRepository.encontrarExacta(texto) == null -> "Elige una ciudad o comuna de la lista"
+        else -> null
+    }
 
     private fun validarNombre(nombre: String): String? {
         val n = nombre.trim()

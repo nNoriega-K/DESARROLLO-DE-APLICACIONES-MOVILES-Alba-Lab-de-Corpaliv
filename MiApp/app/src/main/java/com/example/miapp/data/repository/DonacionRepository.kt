@@ -15,8 +15,7 @@ class DonacionRepository(private val dao: DonacionDao) {
                 nombre = form.nombre.trim(),
                 correo = form.correo.trim(),
                 monto = form.monto.toInt(),
-                destino = form.destino,
-                mensual = form.mensual,
+                ubicacion = form.ubicacion,
                 fechaCargo = requireNotNull(form.fechaCargo),
                 creadaEn = System.currentTimeMillis()
             )

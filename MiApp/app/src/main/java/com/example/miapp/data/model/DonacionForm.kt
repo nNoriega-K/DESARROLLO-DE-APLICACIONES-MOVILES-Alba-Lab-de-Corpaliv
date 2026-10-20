@@ -3,9 +3,8 @@ package com.example.miapp.data.model
 data class DonacionForm(
     val nombre: String = "",
     val correo: String = "",
+    val ubicacion: String = "",                                                    
     val monto: String = "",
-    val destino: String = "",
-    val mensual: Boolean = false,
     val fechaCargo: Long? = null,                                                            
     val numeroTarjeta: String = "",
     val vencimiento: String = "",                                   
@@ -16,6 +15,5 @@ data class DonacionForm(
 data class DonacionConfirmada(
     val nombre: String,
     val monto: Int,
-    val destino: String,
-    val mensual: Boolean
+    val ubicacion: String
 )

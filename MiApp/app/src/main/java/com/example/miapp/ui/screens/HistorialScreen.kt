@@ -120,14 +120,13 @@ private fun TarjetaDonacion(
                     text = formatoPesos(donacion.monto),
                     style = MaterialTheme.typography.titleLarge
                 )
-                Text(donacion.destino)
+                Text("Desde ${donacion.ubicacion}")
                 Text(
                     text = "Donante: ${donacion.nombre}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = "Cargo: ${formatoFechaUtc(donacion.fechaCargo)}" +
-                            if (donacion.mensual) " · Mensual" else "",
+                    text = "Cargo: ${formatoFechaUtc(donacion.fechaCargo)}",
                     style = MaterialTheme.typography.bodySmall
                 )
             }

@@ -9,8 +9,7 @@ data class Donacion(
     val nombre: String,
     val correo: String,
     val monto: Int,
-    val destino: String,
-    val mensual: Boolean,
+    val ubicacion: String,                                                 
     val fechaCargo: Long,                      
     val creadaEn: Long                                       
 )
