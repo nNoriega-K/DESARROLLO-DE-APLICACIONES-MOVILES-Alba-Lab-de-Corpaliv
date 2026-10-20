@@ -8,9 +8,14 @@ import android.media.ExifInterface
 import android.net.Uri
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.content.FileProvider
 import java.io.File
 
 class FotoPerfilRepository(context: Context) {
+
+    private companion object {
+        const val CARPETA_CAMARA = "camera"
+    }
 
     private val appContext = context.applicationContext
     private val archivo = File(appContext.filesDir, "foto_perfil.jpg")
@@ -27,6 +32,23 @@ class FotoPerfilRepository(context: Context) {
         } catch (e: Exception) {
             null
         }
+    }
+
+    fun crearUriCamara(): Uri {
+        val carpeta = File(appContext.cacheDir, CARPETA_CAMARA)
+        if (!carpeta.exists() && !carpeta.mkdirs()) {
+            throw IllegalStateException("No se pudo crear la carpeta de la cámara")
+        }
+        val temporal = File.createTempFile("perfil_", ".jpg", carpeta)
+        return FileProvider.getUriForFile(
+            appContext,
+            "${appContext.packageName}.fileprovider",
+            temporal
+        )
+    }
+
+    fun limpiarTemporales() {
+        File(appContext.cacheDir, CARPETA_CAMARA).listFiles()?.forEach { it.delete() }
     }
 
     private fun decodificar(archivo: File): ImageBitmap? {

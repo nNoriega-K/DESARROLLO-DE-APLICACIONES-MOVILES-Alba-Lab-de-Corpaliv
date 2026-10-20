@@ -27,3 +27,6 @@ fun hoyUtcMillis(): Long {
         )
     }.timeInMillis
 }
+
+fun formatoFechaHora(millis: Long): String =
+    SimpleDateFormat("dd/MM/yyyy HH:mm", LOCALE_CL).format(Date(millis))

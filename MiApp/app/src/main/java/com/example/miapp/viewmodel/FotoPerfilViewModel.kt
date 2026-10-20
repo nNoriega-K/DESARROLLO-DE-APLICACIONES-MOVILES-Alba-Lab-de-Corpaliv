@@ -27,6 +27,23 @@ class FotoPerfilViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    fun crearUriCamara(): Uri = repositorio.crearUriCamara()
+
+    fun guardarFotoDeCamara(uri: Uri) {
+        viewModelScope.launch {
+            val nueva = withContext(Dispatchers.IO) {
+                val resultado = repositorio.guardar(uri)
+                repositorio.limpiarTemporales()
+                resultado
+            }
+            if (nueva != null) _foto.value = nueva
+        }
+    }
+
+    fun descartarFotosTemporales() {
+        viewModelScope.launch(Dispatchers.IO) { repositorio.limpiarTemporales() }
+    }
+
     fun guardarFoto(uri: Uri) {
         viewModelScope.launch {
             val nueva = withContext(Dispatchers.IO) { repositorio.guardar(uri) }
