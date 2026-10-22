@@ -20,8 +20,8 @@ private val LightColorScheme = lightColorScheme(
     primary = Blue,
     secondary = LightBlue,
     tertiary = Green,
-    background = Pink40,
-    onBackground = Blue
+    background = Blanco,
+    onBackground = Negro
 )
 
 @Composable
